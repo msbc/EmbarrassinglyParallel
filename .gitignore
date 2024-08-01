@@ -1,0 +1,13 @@
+# Mac OS metadata
+.DS_Store
+
+# editor temp files
+*~
+*.swp
+
+# python cache
+__pycache__
+
+# slurm output files
+slurm-*.out
+slurm-*.err
