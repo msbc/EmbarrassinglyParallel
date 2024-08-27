@@ -12,6 +12,13 @@ echo "My SLURM_ARRAY_JOB_ID is $SLURM_ARRAY_JOB_ID."
 echo "My SLURM_ARRAY_TASK_ID is $SLURM_ARRAY_TASK_ID"
 echo "Executing on the machine:" $(hostname)
 
+# on task 0 create 5 scripts that will print the task id
+if [ $SLURM_ARRAY_TASK_ID -eq 0 ]; then
+  for i in {0..4} ; do
+    echo "echo \"echo $i\"" > ${i}.sh
+  done
+fi
+
 # run the python script with the task id as an argument
 python square.py $SLURM_ARRAY_TASK_ID
 
@@ -38,3 +45,28 @@ case $SLURM_ARRAY_TASK_ID in
     4) echo "Fifth task done";;
     *) echo "Task not recognized";;
 esac
+
+files=([0-9]+.sh)
+file=${files[$SLURM_ARRAY_TASK_ID]}
+if [-f $file]; then
+    echo "Running $file"
+    bash $file
+else
+    echo "No file $file"
+fi
+
+# run a range of scripts based on the task id
+files=(my_script_*.sh)
+start=$((4*$SLURM_ARRAY_TASK_ID))
+end=$((4*$SLURM_ARRAY_TASK_ID+3))
+for i in {$start..$end} ; do
+    file=${files[$i]}
+    if [-f $file]; then
+        echo "Running $file"
+        bash $file
+    else
+        echo "No file $file"
+    fi
+done
+
+# end of job script
